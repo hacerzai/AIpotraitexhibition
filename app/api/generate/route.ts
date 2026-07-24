@@ -20,21 +20,30 @@ const RequestSchema = z.object({
 const blocked = ['nude', 'naked', 'sexual', 'gore'];
 
 const stylePrompts: Record<string, string> = {
-  cyberpunk: 'Transform this portrait into a cinematic cyberpunk character with tasteful futuristic clothing, neon city lights, blue and magenta rim lighting, atmospheric haze and premium editorial detail.',
-  renaissance: 'Transform this portrait into an elegant Renaissance oil painting with museum-quality brushwork, warm chiaroscuro lighting, rich fabrics and a timeless formal composition.',
-  watercolor: 'Transform this portrait into a refined watercolor illustration with expressive pigment, soft paper texture, delicate edges and luminous natural color.',
-  anime: 'Transform this portrait into a polished cinematic anime character while keeping the face immediately recognizable, with expressive eyes, clean linework and dramatic lighting.',
-  royal: 'Transform this portrait into a majestic royal portrait with refined ceremonial clothing, an elegant palace setting, cinematic light and premium editorial detail.',
-  astronaut: 'Transform this portrait into a heroic astronaut portrait inside a futuristic spacecraft, with realistic suit materials, soft cosmic light and cinematic depth.',
-  superhero: 'Transform this portrait into an original heroic comic-book character with a unique non-branded suit, dramatic lighting and a cinematic city backdrop.',
-  fantasy: 'Transform this portrait into a cinematic fantasy character in an enchanted world with intricate clothing, magical atmosphere and sophisticated lighting.',
+  anime: 'Transform this portrait into polished cinematic anime character art with expressive but recognizable facial features, clean linework and dramatic soft lighting.',
+  comic: 'Transform this portrait into premium comic-book cover art with bold ink, controlled halftone texture, vibrant color and cinematic heroic lighting.',
+  cyberpunk: 'Transform this portrait into a cinematic cyberpunk character with tasteful futuristic clothing, neon city lights, blue and magenta rim lighting and atmospheric haze.',
+  royal: 'Transform this portrait into a majestic royal oil painting with refined ceremonial clothing, an elegant palace setting and museum-quality lighting.',
+  watercolour: 'Transform this portrait into a refined watercolor illustration with expressive pigment, soft paper texture, delicate edges and luminous natural color.',
+  oil: 'Transform this portrait into a classical gallery-quality oil painting with rich brushwork, refined chiaroscuro, realistic anatomy and timeless composition.',
+  '3d': 'Transform this portrait into a premium stylized 3D animated-film character with appealing materials, natural facial proportions and soft cinematic lighting.',
+  scifi: 'Transform this portrait into an epic science-fiction explorer with an original advanced suit, futuristic environment and cinematic atmospheric lighting.',
+  fantasy: 'Transform this portrait into a legendary fantasy warrior with elegant original armor, a magical environment and sophisticated cinematic lighting.',
+  vintage: 'Transform this portrait into a timeless analogue-cinema portrait with tasteful vintage wardrobe, natural film grain, rich tonal contrast and classic lighting.',
+  pencil: 'Transform this portrait into a highly detailed graphite pencil drawing on clean fine-art paper with realistic shading and precise facial structure.',
+  pop: 'Transform this portrait into bold neon pop art with vibrant graphic shapes, crisp facial identity, gallery composition and energetic exhibition lighting.',
 };
 
 const templatePrompts: Record<string, string> = {
-  magazine: 'Create a premium fashion magazine cover portrait. Preserve the person exactly while upgrading the lighting, styling and background. Do not add logos, words, letters or watermarks.',
-  yearbook: 'Create a clean modern yearbook-style studio portrait with flattering soft light, a tasteful neutral background and natural realistic detail.',
-  film: 'Create a cinematic movie-poster portrait with dramatic lighting, rich color grading and atmospheric depth. Do not add text, logos, titles or watermarks.',
-  museum: 'Create a gallery-quality fine-art portrait suitable for a museum exhibition, with refined composition, sophisticated lighting and beautiful material detail.',
+  magazine: 'Create a premium fashion magazine cover-style portrait. Preserve the person while upgrading the lighting, styling and editorial background. Do not add words, letters, logos or watermarks.',
+  movie: 'Create a cinematic blockbuster-poster portrait with dramatic lighting, rich color grading and atmospheric depth. Do not add titles, words, logos or watermarks.',
+  superhero: 'Create an original non-branded superhero collectible portrait with a unique tasteful suit, heroic presence, dramatic lighting and no text or logos.',
+  'future-id': 'Create a sleek futuristic identity-card style portrait with holographic interface accents and a clean high-tech composition. Do not add readable personal data, words or logos.',
+  space: 'Create a heroic space-explorer mission portrait with a realistic original astronaut suit, stars, spacecraft ambience and cinematic light.',
+  graduate: 'Create a premium graduation portrait with an academic gown, celebratory but refined studio lighting and a polished keepsake composition.',
+  champion: 'Create a powerful sports-champion portrait with an original athletic outfit, stadium lighting and an uplifting victory atmosphere. Do not add team logos or text.',
+  leader: 'Create a dignified historical-leader portrait with respectful period clothing, formal composition, realistic painterly detail and museum lighting.',
+  festival: 'Create an elegant family-friendly festival greeting portrait with warm decorative lights, celebratory ambience and refined color. Do not add text or logos.',
 };
 
 function buildPrompt(styleId?: string | null, templateId?: string | null, customPrompt?: string | null) {
