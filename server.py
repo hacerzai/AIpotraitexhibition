@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 import time
@@ -7,18 +6,31 @@ import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = 3000
-TOKEN = base64.b64decode('cjhfOG5oUHVIcWpQTlhkMkVwQjBBSWNobktCODgxcm1YNTNTSmJtZA==').decode('utf-8')
 CREATE_URL = 'https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions'
+TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'replicate_token.txt')
+
+
+def load_token():
+    try:
+        with open(TOKEN_FILE, 'r', encoding='utf-8') as file:
+            token = file.read().strip()
+    except FileNotFoundError:
+        raise RuntimeError('Replicate token file is missing. Close this window and run START_APP.bat again.')
+
+    if not token.startswith('r8_') or len(token) < 20:
+        raise RuntimeError('The saved Replicate token is invalid. Delete replicate_token.txt and run START_APP.bat again.')
+    return token
 
 
 def api_request(url, method='GET', payload=None):
+    token = load_token()
     data = json.dumps(payload).encode('utf-8') if payload is not None else None
     request = urllib.request.Request(
         url,
         data=data,
         method=method,
         headers={
-            'Authorization': f'Bearer {TOKEN}',
+            'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json',
             'Prefer': 'wait=60',
             'User-Agent': 'AI-Portrait-Exhibition/1.0'
@@ -120,6 +132,13 @@ class PortraitHandler(SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        load_token()
+    except RuntimeError as error:
+        print(f'\nERROR: {error}\n')
+        input('Press Enter to close...')
+        raise SystemExit(1)
+
     server = ThreadingHTTPServer(('127.0.0.1', PORT), PortraitHandler)
     print('\nAI Portrait Exhibition is running!')
     print(f'Open this address in Chrome or Edge: http://localhost:{PORT}')
