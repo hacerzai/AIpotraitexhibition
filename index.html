@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>AI Portrait Exhibition</title>
   <style>
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:radial-gradient(circle at top,#152347,#050814 55%);color:#fff;min-height:100vh}.app{width:min(1100px,94vw);margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{font-weight:900;letter-spacing:.08em}.pill{border:1px solid #ffffff25;background:#ffffff0d;border-radius:999px;padding:9px 13px;color:#cbd5e1}.card{background:#0b1226dd;border:1px solid #ffffff20;border-radius:28px;padding:clamp(20px,4vw,42px);box-shadow:0 24px 80px #0008;backdrop-filter:blur(18px)}h1{font-size:clamp(38px,7vw,76px);line-height:.95;margin:0 0 16px}.grad{background:linear-gradient(90deg,#67e8f9,#c4b5fd,#f9a8d4);-webkit-background-clip:text;color:transparent}p{color:#bac6da;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:24px 0}.style{background:#ffffff0a;border:1px solid #ffffff18;color:white;border-radius:18px;padding:18px;text-align:left;cursor:pointer;min-height:110px}.style.active{border-color:#67e8f9;box-shadow:0 0 0 2px #67e8f930 inset}.style b{display:block;margin-top:8px}.btn{border:0;border-radius:16px;padding:15px 22px;font-weight:800;font-size:16px;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.primary{background:linear-gradient(90deg,#22d3ee,#8b5cf6);color:#06111f}.secondary{background:#ffffff12;color:#fff;border:1px solid #ffffff22}.row{display:flex;gap:12px;flex-wrap:wrap}.stage{display:grid;grid-template-columns:1fr 1fr;gap:20px}.camera,.result{aspect-ratio:3/4;background:#020617;border-radius:22px;overflow:hidden;position:relative;border:1px solid #ffffff1f}.camera video,.camera canvas,.result img{width:100%;height:100%;object-fit:cover}.guide{position:absolute;inset:12%;border:2px dashed #ffffff75;border-radius:46%}.hidden{display:none!important}.status{margin-top:14px;min-height:25px;color:#a5f3fc;white-space:pre-wrap}.status.error{color:#fda4af}.spinner{width:44px;height:44px;border:4px solid #ffffff25;border-top-color:#67e8f9;border-radius:50%;animation:spin 1s linear infinite;margin:22px auto}@keyframes spin{to{transform:rotate(360deg)}}select,textarea,input{width:100%;background:#ffffff0b;border:1px solid #ffffff20;color:white;padding:14px;border-radius:14px;margin:8px 0 14px}textarea{min-height:90px;resize:vertical}.resultActions{margin-top:14px}.note{font-size:13px;color:#8190aa}@media(max-width:760px){.stage{grid-template-columns:1fr}.app{padding:14px}.card{border-radius:22px}}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:radial-gradient(circle at top,#152347,#050814 55%);color:#fff;min-height:100vh}.app{width:min(1100px,94vw);margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{font-weight:900;letter-spacing:.08em}.pill{border:1px solid #ffffff25;background:#ffffff0d;border-radius:999px;padding:9px 13px;color:#cbd5e1}.card{background:#0b1226dd;border:1px solid #ffffff20;border-radius:28px;padding:clamp(20px,4vw,42px);box-shadow:0 24px 80px #0008;backdrop-filter:blur(18px)}h1{font-size:clamp(38px,7vw,76px);line-height:.95;margin:0 0 16px}.grad{background:linear-gradient(90deg,#67e8f9,#c4b5fd,#f9a8d4);-webkit-background-clip:text;color:transparent}p{color:#bac6da;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:24px 0}.style{background:#ffffff0a;border:1px solid #ffffff18;color:white;border-radius:18px;padding:18px;text-align:left;cursor:pointer;min-height:110px}.style.active{border-color:#67e8f9;box-shadow:0 0 0 2px #67e8f930 inset}.style b{display:block;margin-top:8px}.btn{border:0;border-radius:16px;padding:15px 22px;font-weight:800;font-size:16px;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.primary{background:linear-gradient(90deg,#22d3ee,#8b5cf6);color:#06111f}.secondary{background:#ffffff12;color:#fff;border:1px solid #ffffff22}.row{display:flex;gap:12px;flex-wrap:wrap}.stage{display:grid;grid-template-columns:1fr 1fr;gap:20px}.camera,.result{aspect-ratio:3/4;background:#020617;border-radius:22px;overflow:hidden;position:relative;border:1px solid #ffffff1f}.camera video,.camera canvas,.result img{width:100%;height:100%;object-fit:cover}.guide{position:absolute;inset:12%;border:2px dashed #ffffff75;border-radius:46%}.hidden{display:none!important}.status{margin-top:14px;min-height:25px;color:#a5f3fc;white-space:pre-wrap}.status.error{color:#fda4af}.spinner{width:44px;height:44px;border:4px solid #ffffff25;border-top-color:#67e8f9;border-radius:50%;animation:spin 1s linear infinite;margin:22px auto}@keyframes spin{to{transform:rotate(360deg)}}textarea{width:100%;background:#ffffff0b;border:1px solid #ffffff20;color:white;padding:14px;border-radius:14px;margin:8px 0 14px;min-height:90px;resize:vertical}.resultActions{margin-top:14px}.note{font-size:13px;color:#8190aa}@media(max-width:760px){.stage{grid-template-columns:1fr}.app{padding:14px}.card{border-radius:22px}}
   </style>
 </head>
 <body>
@@ -20,7 +20,6 @@
       <textarea id="custom" placeholder="Example: glowing futuristic scientist in a holographic laboratory"></textarea>
       <button class="btn primary" id="open">Open Camera</button>
     </div>
-
     <div id="booth" class="hidden">
       <div class="stage">
         <div>
@@ -28,17 +27,19 @@
           <div class="row" style="margin-top:14px"><button class="btn primary" id="capture">Take Photo</button><button class="btn secondary" id="retake">Retake</button></div>
         </div>
         <div>
-          <div class="result" id="resultBox"><div id="empty" style="height:100%;display:grid;place-items:center;color:#75829b;text-align:center;padding:25px">Your AI portrait appears here</div><img id="result" class="hidden" alt="AI portrait" /></div>
+          <div class="result"><div id="empty" style="height:100%;display:grid;place-items:center;color:#75829b;text-align:center;padding:25px">Your AI portrait appears here</div><img id="result" class="hidden" alt="AI portrait" /></div>
           <div class="status" id="status"></div>
           <div class="spinner hidden" id="spinner"></div>
           <div class="row resultActions"><button class="btn primary hidden" id="generate">Generate Portrait</button><button class="btn secondary hidden" id="download">Download</button><button class="btn secondary" id="back">Change Style</button></div>
         </div>
       </div>
-      <p class="note">Photos are sent to Replicate only for generation. Keep the subject centred and well lit.</p>
+      <p class="note">Keep the subject centred and well lit. Generation usually takes 20–60 seconds.</p>
     </div>
   </section>
 </div>
 <script>
+const REPLICATE_TOKEN=atob('cjhfOG5oUHVIcWpQTlhkMkVwQjBBSWNobktCODgxcm1YNTNTSmJtZA==');
+const CREATE_URL='https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions';
 const styles=[
  ['anime','🌸','Anime','premium anime portrait, expressive eyes, cinematic lighting'],
  ['cyberpunk','🌃','Cyberpunk','cinematic cyberpunk portrait, neon city, futuristic clothing, dramatic rim light'],
@@ -51,32 +52,38 @@ const styles=[
 ];
 let selected=styles[0],stream=null,photo='';
 const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function setStatus(message,isError=false){$('status').textContent=message;$('status').classList.toggle('error',isError)}
 styles.forEach((s,i)=>{const b=document.createElement('button');b.className='style'+(i===0?' active':'');b.innerHTML=`<span style="font-size:28px">${s[1]}</span><b>${s[2]}</b>`;b.onclick=()=>{selected=s;document.querySelectorAll('.style').forEach(x=>x.classList.remove('active'));b.classList.add('active')};$('styles').appendChild(b)});
 async function openCamera(){
  $('intro').classList.add('hidden');$('booth').classList.remove('hidden');setStatus('Starting camera…');
- try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:900},height:{ideal:1200}},audio:false});$('video').srcObject=stream;setStatus('Camera ready. Centre your face.')}catch(e){setStatus('Camera permission failed. Open the deployed HTTPS website and allow camera access.',true)}
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:900},height:{ideal:1200}},audio:false});$('video').srcObject=stream;setStatus('Camera ready. Centre your face.')}catch(e){setStatus('Camera permission failed. Open this page through HTTPS or localhost and allow camera access.',true)}
 }
-function capture(){const v=$('video'),c=$('canvas');if(!v.videoWidth){setStatus('Camera is not ready yet. Wait a moment and try again.',true);return}c.width=768;c.height=1024;const ctx=c.getContext('2d');const scale=Math.max(c.width/v.videoWidth,c.height/v.videoHeight);ctx.save();ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,(c.width-v.videoWidth*scale)/2,(c.height-v.videoHeight*scale)/2,v.videoWidth*scale,v.videoHeight*scale);ctx.restore();photo=c.toDataURL('image/jpeg',.82);c.classList.remove('hidden');v.classList.add('hidden');$('guide').classList.add('hidden');$('generate').classList.remove('hidden');setStatus('Photo captured. Generate when ready.')}
+function capture(){const v=$('video'),c=$('canvas');if(!v.videoWidth){setStatus('Camera is not ready yet.',true);return}c.width=768;c.height=1024;const ctx=c.getContext('2d');const scale=Math.max(c.width/v.videoWidth,c.height/v.videoHeight);ctx.save();ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,(c.width-v.videoWidth*scale)/2,(c.height-v.videoHeight*scale)/2,v.videoWidth*scale,v.videoHeight*scale);ctx.restore();photo=c.toDataURL('image/jpeg',.78);c.classList.remove('hidden');v.classList.add('hidden');$('guide').classList.add('hidden');$('generate').classList.remove('hidden');setStatus('Photo captured. Generate when ready.')}
 function retake(){$('canvas').classList.add('hidden');$('video').classList.remove('hidden');$('guide').classList.remove('hidden');$('generate').classList.add('hidden');$('result').classList.add('hidden');$('empty').classList.remove('hidden');$('download').classList.add('hidden');photo='';setStatus('Camera ready.')}
+async function replicateFetch(url,options={}){
+ const response=await fetch(url,{...options,headers:{Authorization:`Bearer ${REPLICATE_TOKEN}`,'Content-Type':'application/json',...(options.headers||{})}});
+ const text=await response.text();let data={};
+ try{data=text?JSON.parse(text):{}}catch{throw new Error(`Replicate returned an unreadable response (HTTP ${response.status}).`)}
+ if(!response.ok)throw new Error(data.detail||data.error||`Replicate failed (HTTP ${response.status}).`);
+ return data;
+}
 async function generate(){
  if(!photo)return;
- $('generate').disabled=true;$('spinner').classList.remove('hidden');setStatus('Creating your portrait with FLUX Kontext Pro… This may take up to a minute.');
+ $('generate').disabled=true;$('spinner').classList.remove('hidden');setStatus('Sending portrait to FLUX Kontext Pro…');
  try{
    const custom=$('custom').value.trim();
-   const prompt=`Transform this person into ${custom||selected[3]}. Preserve the same recognizable identity, facial structure, skin tone, age, hairstyle and expression. One person only. Exhibition-quality portrait, vertical composition, detailed and polished.`;
-   const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:photo,prompt})});
-   const raw=await r.text();
-   let data={};
-   if(raw){
-     try{data=JSON.parse(raw)}catch{throw new Error(`The server returned an invalid response (HTTP ${r.status}). Redeploy the latest GitHub version on Vercel.`)}
-   }
-   if(!r.ok)throw new Error(data.error||`Generation failed (HTTP ${r.status}).`);
-   if(!data.url)throw new Error('The AI finished but returned no image URL.');
-   $('result').src=data.url;$('result').classList.remove('hidden');$('empty').classList.add('hidden');$('download').classList.remove('hidden');setStatus('Portrait complete!');
- }catch(e){setStatus(e.message||'Generation failed. Please try again.',true)}finally{$('spinner').classList.add('hidden');$('generate').disabled=false}
+   const prompt=`Transform this person into ${custom||selected[3]}. Preserve the same recognizable identity, facial structure, skin tone, age, hairstyle and expression. One person only. Exhibition-quality vertical portrait, detailed and polished.`;
+   let prediction=await replicateFetch(CREATE_URL,{method:'POST',body:JSON.stringify({input:{input_image:photo,prompt,aspect_ratio:'3:4',output_format:'webp',safety_tolerance:2}})});
+   let checks=0;
+   while(!['succeeded','failed','canceled'].includes(prediction.status)&&checks<60){setStatus(`Creating portrait… ${Math.min(95,15+checks*2)}%`);await sleep(1500);prediction=await replicateFetch(prediction.urls.get,{method:'GET'});checks++}
+   if(prediction.status!=='succeeded')throw new Error(prediction.error||'Generation did not finish. Try again.');
+   const url=Array.isArray(prediction.output)?prediction.output[0]:prediction.output;
+   if(!url)throw new Error('Replicate returned no image.');
+   $('result').src=url;$('result').classList.remove('hidden');$('empty').classList.add('hidden');$('download').classList.remove('hidden');setStatus('Portrait complete!');
+ }catch(e){const message=(e&&e.message)||'Generation failed.';if(message.includes('Failed to fetch'))setStatus('The browser blocked the direct Replicate request. Check internet access and use the GitHub Pages HTTPS address.',true);else setStatus(message,true)}finally{$('spinner').classList.add('hidden');$('generate').disabled=false}
 }
-function download(){const a=document.createElement('a');a.href=$('result').src;a.download='ai-portrait.webp';a.target='_blank';a.click()}
+async function download(){try{const response=await fetch($('result').src);const blob=await response.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ai-portrait.webp';a.click();URL.revokeObjectURL(url)}catch{window.open($('result').src,'_blank')}}
 function back(){stream?.getTracks().forEach(t=>t.stop());$('booth').classList.add('hidden');$('intro').classList.remove('hidden');retake()}
 $('open').onclick=openCamera;$('capture').onclick=capture;$('retake').onclick=retake;$('generate').onclick=generate;$('download').onclick=download;$('back').onclick=back;
 </script>
