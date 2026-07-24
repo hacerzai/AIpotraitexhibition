@@ -5,20 +5,27 @@ import urllib.error
 import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-PORT = 3000
+PORT = int(os.environ.get('PORT', '3000'))
+HOST = os.environ.get('HOST', '0.0.0.0')
 CREATE_URL = 'https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions'
 TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'replicate_token.txt')
 
 
 def load_token():
-    try:
-        with open(TOKEN_FILE, 'r', encoding='utf-8') as file:
-            token = file.read().strip()
-    except FileNotFoundError:
-        raise RuntimeError('Replicate token file is missing. Close this window and run START_APP.bat again.')
+    token = os.environ.get('REPLICATE_API_TOKEN', '').strip()
+
+    if not token:
+        try:
+            with open(TOKEN_FILE, 'r', encoding='utf-8') as file:
+                token = file.read().strip()
+        except FileNotFoundError:
+            raise RuntimeError(
+                'Replicate token is missing. On Render, add REPLICATE_API_TOKEN as an environment variable. '
+                'For local use, close this window and run START_APP.bat again.'
+            )
 
     if not token.startswith('r8_') or len(token) < 20:
-        raise RuntimeError('The saved Replicate token is invalid. Delete replicate_token.txt and run START_APP.bat again.')
+        raise RuntimeError('The Replicate token is invalid. Create a new token and update it before restarting the app.')
     return token
 
 
@@ -33,7 +40,7 @@ def api_request(url, method='GET', payload=None):
             'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json',
             'Prefer': 'wait=60',
-            'User-Agent': 'AI-Portrait-Exhibition/1.0'
+            'User-Agent': 'AI-Portrait-Booth/1.0'
         },
     )
     try:
@@ -58,6 +65,16 @@ class PortraitHandler(SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         self.end_headers()
         self.wfile.write(body)
+
+    def do_GET(self):
+        if self.path == '/health':
+            try:
+                load_token()
+                self.send_json(200, {'status': 'ok'})
+            except RuntimeError as error:
+                self.send_json(503, {'status': 'error', 'error': str(error)})
+            return
+        super().do_GET()
 
     def do_POST(self):
         if self.path != '/generate':
@@ -136,13 +153,14 @@ if __name__ == '__main__':
         load_token()
     except RuntimeError as error:
         print(f'\nERROR: {error}\n')
-        input('Press Enter to close...')
+        if os.environ.get('RENDER') != 'true':
+            input('Press Enter to close...')
         raise SystemExit(1)
 
-    server = ThreadingHTTPServer(('127.0.0.1', PORT), PortraitHandler)
-    print('\nAI Portrait Exhibition is running!')
-    print(f'Open this address in Chrome or Edge: http://localhost:{PORT}')
-    print('Keep this window open during the exhibition.\n')
+    server = ThreadingHTTPServer((HOST, PORT), PortraitHandler)
+    print('\nAI Portrait Booth is running!')
+    print(f'Listening on http://{HOST}:{PORT}')
+    print('Keep this process running.\n')
     try:
         server.serve_forever()
     except KeyboardInterrupt:
