@@ -85,7 +85,7 @@ class PortraitHandler(SimpleHTTPRequestHandler):
                         'input_image': image,
                         'prompt': prompt,
                         'aspect_ratio': '3:4',
-                        'output_format': 'webp',
+                        'output_format': 'png',
                         'safety_tolerance': 2
                     }
                 },
