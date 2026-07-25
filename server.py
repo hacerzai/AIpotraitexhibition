@@ -2,6 +2,7 @@ import base64
 import binascii
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -37,14 +38,43 @@ def load_replicate_token():
     return token
 
 
+def clean_secret(value):
+    value = (value or '').strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+        value = value[1:-1].strip()
+    return value
+
+
 def load_cloudflare_credentials():
-    token = os.environ.get('CLOUDFLARE_API_TOKEN', '').strip()
-    account_id = os.environ.get('CLOUDFLARE_ACCOUNT_ID', '').strip()
+    # Accept the documented names plus common Render aliases. This prevents an
+    # otherwise-valid setup from silently falling through because the variable
+    # was named CF_* in the dashboard.
+    token = clean_secret(
+        os.environ.get('CLOUDFLARE_API_TOKEN')
+        or os.environ.get('CF_API_TOKEN')
+        or os.environ.get('CLOUDFLARE_AI_API_TOKEN')
+    )
+    account_id = clean_secret(
+        os.environ.get('CLOUDFLARE_ACCOUNT_ID')
+        or os.environ.get('CF_ACCOUNT_ID')
+        or os.environ.get('ACCOUNT_ID')
+    )
+
+    if token.lower().startswith('bearer '):
+        token = token[7:].strip()
+
+    # Also tolerate an Account ID copied as part of an API URL.
+    account_match = re.search(r'/accounts/([0-9a-fA-F]{32})', account_id)
+    if account_match:
+        account_id = account_match.group(1)
+
     if not token or not account_id:
         raise ProviderError(
             'Cloudflare backup is not configured. Add CLOUDFLARE_API_TOKEN and '
             'CLOUDFLARE_ACCOUNT_ID in Render.'
         )
+    if not re.fullmatch(r'[0-9a-fA-F]{32}', account_id):
+        raise ProviderError('The Cloudflare Account ID must be the 32-character Account ID, not a zone ID or email.')
     return token, account_id
 
 
@@ -203,8 +233,21 @@ def generate_with_cloudflare(image, prompt):
 
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
-            raw = response.read().decode('utf-8')
-            payload = json.loads(raw) if raw else {}
+            response_bytes = response.read()
+            response_type = response.headers.get('Content-Type', '').split(';', 1)[0].lower()
+            # Workers AI image endpoints can return either raw image bytes or
+            # the normal Cloudflare JSON envelope, depending on the model/API
+            # response negotiation. Support both instead of treating a valid
+            # PNG response as unreadable JSON.
+            if response_type.startswith('image/'):
+                encoded = base64.b64encode(response_bytes).decode('ascii')
+                return f'data:{response_type};base64,{encoded}'
+            try:
+                payload = json.loads(response_bytes.decode('utf-8')) if response_bytes else {}
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise ProviderError(
+                    f'Cloudflare returned an unsupported response type ({response_type or "unknown"}).'
+                ) from error
     except urllib.error.HTTPError as error:
         payload = read_http_error(error)
         raise ProviderError(provider_message(payload, f'Cloudflare failed (HTTP {error.code}).')) from error
@@ -213,9 +256,11 @@ def generate_with_cloudflare(image, prompt):
         raise ProviderError(provider_message(payload, 'Cloudflare backup generation failed.'))
 
     result = payload.get('result') or {}
-    encoded_image = result.get('image') if isinstance(result, dict) else None
+    encoded_image = result.get('image') if isinstance(result, dict) else result if isinstance(result, str) else None
     if not encoded_image:
         raise ProviderError('Cloudflare returned no image.')
+    if encoded_image.startswith('data:image/'):
+        return encoded_image
     return f'data:image/png;base64,{encoded_image}'
 
 
