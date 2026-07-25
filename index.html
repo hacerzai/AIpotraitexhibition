@@ -218,7 +218,6 @@
     async function generate(){
       if(!photo)return;
       $('generate').disabled=true;$('spinner').classList.remove('hidden');
-      if(sessionStorage.getItem('freePortraitMode')==='1'){try{await generateFreePortrait()}catch(e){setStatus('Free portrait mode failed: '+((e&&e.message)||'Unknown error'),true)}finally{$('spinner').classList.add('hidden');$('generate').disabled=false}return}
       setStatus('Creating your portrait with FLUX Kontext Pro…');
       try{
         const custom=$('custom').value.trim();
@@ -231,7 +230,6 @@
         showPortrait(data.url,data.provider==='cloudflare'?'Portrait complete — Cloudflare backup AI used.':'Portrait complete!');
       }catch(e){
         console.warn('Online generation unavailable; switching to free mode.',e);
-        sessionStorage.setItem('freePortraitMode','1');
         try{await generateFreePortrait()}catch(fallbackError){setStatus((fallbackError&&fallbackError.message)||'Free portrait mode failed. Please retake and try again.',true)}
       }finally{$('spinner').classList.add('hidden');$('generate').disabled=false}
     }

@@ -235,6 +235,15 @@ def provider_status():
 
 
 class PortraitHandler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        # The booth is frequently updated during exhibitions. Never let a browser
+        # keep an older HTML file whose provider-routing logic may be stale.
+        if self.path in ('/', '/index.html') or self.path.endswith('.html'):
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+        super().end_headers()
+
     def send_json(self, status, payload):
         body = json.dumps(payload).encode('utf-8')
         self.send_response(status)
