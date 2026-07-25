@@ -120,7 +120,7 @@
                 <div class="delivery hidden" id="delivery"><label for="email">Email portrait</label><input id="email" type="email" placeholder="visitor@example.com"><button class="btn secondary" id="emailButton">Open Email App</button><p class="note">This opens the computer's email app with the portrait link filled in.</p></div>
               </div>
             </div>
-            <p class="note">Keep the subject centred and well lit. Generation usually takes 20–60 seconds.</p>
+            <p class="note">Keep the subject centred and well lit. Free art mode activates automatically if online AI credits are unavailable.</p>
           </div>
         </section>
       </div>
@@ -131,11 +131,11 @@
         <div class="about-panel reveal">
           <div class="about-top">
             <div><span class="kicker">Behind the magic</span><h2>How it works</h2></div>
-            <p>A seamless portrait pipeline powered by Replicate and FLUX Kontext Pro—designed for a fast, memorable exhibition experience.</p>
+            <p>A seamless portrait pipeline with premium online AI and a built-in free art mode, so the exhibition keeps working even when API credits are unavailable.</p>
           </div>
           <div class="steps">
             <article class="step reveal"><span class="step-num">STEP 01</span><div class="step-icon">📷</div><h3>Capture</h3><p>Frame your face in the guided camera and take your portrait.</p></article>
-            <article class="step reveal delay-1"><span class="step-num">STEP 02</span><div class="step-icon">🧠</div><h3>Transform</h3><p>AI applies your selected style while preserving your identity.</p></article>
+            <article class="step reveal delay-1"><span class="step-num">STEP 02</span><div class="step-icon">🧠</div><h3>Transform</h3><p>The selected style is applied through online AI or the free on-device art engine.</p></article>
             <article class="step reveal delay-2"><span class="step-num">STEP 03</span><div class="step-icon">🖼️</div><h3>Reveal</h3><p>Your polished, one-of-a-kind portrait appears within seconds.</p></article>
             <article class="step reveal delay-3"><span class="step-num">STEP 04</span><div class="step-icon">✨</div><h3>Take it home</h3><p>Download, print, or email your finished AI artwork.</p></article>
           </div>
@@ -166,9 +166,60 @@
     }
     function capture(){const v=$('video'),c=$('canvas');if(!v.videoWidth){setStatus('Camera is not ready yet.',true);return}c.width=768;c.height=1024;const ctx=c.getContext('2d');const scale=Math.max(c.width/v.videoWidth,c.height/v.videoHeight);ctx.save();ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,(c.width-v.videoWidth*scale)/2,(c.height-v.videoHeight*scale)/2,v.videoWidth*scale,v.videoHeight*scale);ctx.restore();photo=c.toDataURL('image/jpeg',.78);c.classList.remove('hidden');v.classList.add('hidden');$('guide').classList.add('hidden');$('generate').classList.remove('hidden');setStatus('Photo captured. Generate when ready.')}
     function retake(){$('canvas').classList.add('hidden');$('video').classList.remove('hidden');$('guide').classList.remove('hidden');$('generate').classList.add('hidden');$('result').classList.add('hidden');$('empty').classList.remove('hidden');$('download').classList.add('hidden');$('print').classList.add('hidden');$('delivery').classList.add('hidden');photo='';setStatus('Camera ready.')}
+    function showPortrait(url,message){
+      $('result').src=url;$('result').classList.remove('hidden');$('empty').classList.add('hidden');$('download').classList.remove('hidden');$('print').classList.remove('hidden');$('delivery').classList.remove('hidden');setStatus(message);
+    }
+    function drawOfflineFinish(ctx,w,h,styleId){
+      ctx.save();
+      if(styleId==='cyberpunk'||styleId==='scifi'){
+        const glow=ctx.createLinearGradient(0,0,w,h);glow.addColorStop(0,'rgba(0,238,255,.25)');glow.addColorStop(.5,'rgba(45,0,120,.08)');glow.addColorStop(1,'rgba(255,0,180,.28)');ctx.globalCompositeOperation='screen';ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+        ctx.globalCompositeOperation='source-over';ctx.strokeStyle=styleId==='cyberpunk'?'rgba(80,245,255,.22)':'rgba(140,210,255,.18)';ctx.lineWidth=1;
+        for(let y=0;y<h;y+=8){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+      }
+      if(styleId==='royal'){
+        const gold=ctx.createLinearGradient(0,0,w,h);gold.addColorStop(0,'rgba(255,222,128,.45)');gold.addColorStop(.5,'rgba(120,45,10,.04)');gold.addColorStop(1,'rgba(255,184,70,.35)');ctx.globalCompositeOperation='soft-light';ctx.fillStyle=gold;ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#e8bf6a';ctx.lineWidth=18;ctx.strokeRect(18,18,w-36,h-36);ctx.strokeStyle='rgba(255,248,205,.65)';ctx.lineWidth=3;ctx.strokeRect(31,31,w-62,h-62);
+      }
+      if(styleId==='fantasy'){
+        const magic=ctx.createRadialGradient(w*.5,h*.42,20,w*.5,h*.48,w*.72);magic.addColorStop(0,'rgba(255,215,150,.10)');magic.addColorStop(.65,'rgba(95,45,180,.08)');magic.addColorStop(1,'rgba(15,0,35,.48)');ctx.globalCompositeOperation='screen';ctx.fillStyle=magic;ctx.fillRect(0,0,w,h);ctx.fillStyle='rgba(225,210,255,.7)';for(let i=0;i<42;i++){const x=(i*193)%w,y=(i*337)%h,r=1+(i%3);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+      }
+      const vignette=ctx.createRadialGradient(w/2,h*.42,w*.18,w/2,h*.48,w*.72);vignette.addColorStop(.45,'rgba(0,0,0,0)');vignette.addColorStop(1,styleId==='watercolour'?'rgba(245,238,225,.18)':'rgba(0,0,0,.42)');ctx.globalCompositeOperation='source-over';ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
+      ctx.restore();
+    }
+    async function generateFreePortrait(){
+      setStatus('Replicate credits are unavailable. Creating your free portrait on this device…');
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const source=$('canvas'),out=document.createElement('canvas');out.width=source.width;out.height=source.height;
+      const ctx=out.getContext('2d',{willReadFrequently:true}),w=out.width,h=out.height,id=selected[0];
+      const filters={
+        anime:'saturate(1.45) contrast(1.16) brightness(1.07)',
+        cyberpunk:'saturate(1.75) contrast(1.28) brightness(.88) hue-rotate(12deg)',
+        royal:'sepia(.34) saturate(1.22) contrast(1.08) brightness(.98)',
+        watercolour:'saturate(.9) contrast(.88) brightness(1.13) blur(.7px)',
+        comic:'saturate(1.65) contrast(1.38) brightness(1.02)',
+        scifi:'saturate(1.15) contrast(1.24) brightness(.94) hue-rotate(175deg)',
+        fantasy:'saturate(1.38) contrast(1.12) sepia(.12)',
+        pencil:'grayscale(1) contrast(1.45) brightness(1.18)'
+      };
+      ctx.filter=filters[id]||'none';ctx.drawImage(source,0,0,w,h);ctx.filter='none';
+      const image=ctx.getImageData(0,0,w,h),d=image.data,original=new Uint8ClampedArray(d),step=id==='anime'?42:id==='comic'?55:id==='watercolour'?30:0;
+      for(let i=0;i<d.length;i+=4){
+        let r=d[i],g=d[i+1],b=d[i+2];
+        if(step){r=Math.round(r/step)*step;g=Math.round(g/step)*step;b=Math.round(b/step)*step}
+        if(id==='cyberpunk'){r=Math.min(255,r*.72+45);g=Math.min(255,g*.76+8);b=Math.min(255,b*1.22+28)}
+        if(id==='scifi'){const lum=r*.22+g*.68+b*.10;r=lum*.45;g=Math.min(255,lum*1.08+24);b=Math.min(255,lum*1.35+55)}
+        d[i]=r;d[i+1]=g;d[i+2]=b;
+      }
+      if(id==='comic'||id==='anime'||id==='pencil'){
+        for(let y=1;y<h-1;y+=1){for(let x=1;x<w-1;x+=1){const p=(y*w+x)*4,right=p+4,down=p+w*4;const a=original[p]*.3+original[p+1]*.59+original[p+2]*.11;const edge=Math.abs(a-(original[right]*.3+original[right+1]*.59+original[right+2]*.11))+Math.abs(a-(original[down]*.3+original[down+1]*.59+original[down+2]*.11));if(edge>(id==='anime'?48:32)){const ink=id==='pencil'?Math.max(20,235-edge*2):Math.max(4,46-edge);d[p]=ink;d[p+1]=ink;d[p+2]=ink}}}
+      }
+      ctx.putImageData(image,0,0);drawOfflineFinish(ctx,w,h,id);
+      showPortrait(out.toDataURL('image/png'),'Portrait complete — free on-device art mode used. No credits charged.');
+    }
     async function generate(){
       if(!photo)return;
-      $('generate').disabled=true;$('spinner').classList.remove('hidden');setStatus('Creating your portrait with FLUX Kontext Pro…');
+      $('generate').disabled=true;$('spinner').classList.remove('hidden');
+      if(sessionStorage.getItem('freePortraitMode')==='1'){try{await generateFreePortrait()}catch(e){setStatus('Free portrait mode failed: '+((e&&e.message)||'Unknown error'),true)}finally{$('spinner').classList.add('hidden');$('generate').disabled=false}return}
+      setStatus('Creating your portrait with FLUX Kontext Pro…');
       try{
         const custom=$('custom').value.trim();
         const prompt=`Transform this person into ${custom||selected[3]}. Preserve the same recognizable identity, facial structure, skin tone, age, hairstyle and expression. One person only. Exhibition-quality vertical portrait, detailed and polished.`;
@@ -177,8 +228,12 @@
         try{data=text?JSON.parse(text):{}}catch{throw new Error(`Local server returned an unreadable response (HTTP ${response.status}).`)}
         if(!response.ok)throw new Error(data.error||`Generation failed (HTTP ${response.status}).`);
         if(!data.url)throw new Error('The AI returned no image.');
-        $('result').src=data.url;$('result').classList.remove('hidden');$('empty').classList.add('hidden');$('download').classList.remove('hidden');$('print').classList.remove('hidden');$('delivery').classList.remove('hidden');setStatus('Portrait complete!');
-      }catch(e){setStatus((e&&e.message)||'Generation failed. Keep the black server window open and try again.',true)}finally{$('spinner').classList.add('hidden');$('generate').disabled=false}
+        showPortrait(data.url,'Portrait complete!');
+      }catch(e){
+        console.warn('Online generation unavailable; switching to free mode.',e);
+        sessionStorage.setItem('freePortraitMode','1');
+        try{await generateFreePortrait()}catch(fallbackError){setStatus((fallbackError&&fallbackError.message)||'Free portrait mode failed. Please retake and try again.',true)}
+      }finally{$('spinner').classList.add('hidden');$('generate').disabled=false}
     }
     async function download(){try{const response=await fetch($('result').src);const blob=await response.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ai-portrait.png';a.click();URL.revokeObjectURL(url)}catch{window.open($('result').src,'_blank')}}
     function printPortrait(){if(!$('result').src){setStatus('Generate a portrait before printing.',true);return}window.print()}
