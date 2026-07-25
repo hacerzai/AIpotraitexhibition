@@ -156,7 +156,7 @@
       ['fantasy','⚔️','Fantasy','legendary fantasy warrior portrait, elegant armor, magical environment'],
       ['pencil','✏️','Pencil Sketch','high-detail graphite pencil portrait, fine shading, clean paper']
     ];
-    let selected=styles[0],stream=null,photo='',fallbackPhoto='';
+    let selected=styles[0],stream=null,photo='';
     const $=id=>document.getElementById(id);
     function setStatus(message,isError=false){$('status').textContent=message;$('status').classList.toggle('error',isError)}
     styles.forEach((s,i)=>{const b=document.createElement('button');b.className='style'+(i===0?' active':'');b.innerHTML=`<span>${s[1]}</span><b>${s[2]}</b>`;b.onclick=()=>{selected=s;document.querySelectorAll('.style').forEach(x=>x.classList.remove('active'));b.classList.add('active')};$('styles').appendChild(b)});
@@ -164,15 +164,15 @@
       $('intro').classList.add('hidden');$('booth').classList.remove('hidden');setStatus('Starting camera…');
       try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:900},height:{ideal:1200}},audio:false});$('video').srcObject=stream;setStatus('Camera ready. Centre your face.')}catch(e){setStatus('Camera permission failed. Open the app through http://localhost:3000 and allow camera access.',true)}
     }
-    function capture(){const v=$('video'),c=$('canvas');if(!v.videoWidth){setStatus('Camera is not ready yet.',true);return}c.width=768;c.height=1024;const ctx=c.getContext('2d');const scale=Math.max(c.width/v.videoWidth,c.height/v.videoHeight);ctx.save();ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,(c.width-v.videoWidth*scale)/2,(c.height-v.videoHeight*scale)/2,v.videoWidth*scale,v.videoHeight*scale);ctx.restore();photo=c.toDataURL('image/jpeg',.78);const fallbackCanvas=document.createElement('canvas');fallbackCanvas.width=384;fallbackCanvas.height=512;fallbackCanvas.getContext('2d').drawImage(c,0,0,384,512);fallbackPhoto=fallbackCanvas.toDataURL('image/jpeg',.78);c.classList.remove('hidden');v.classList.add('hidden');$('guide').classList.add('hidden');$('generate').classList.remove('hidden');setStatus('Photo captured. Generate when ready.')}
-    function retake(){$('canvas').classList.add('hidden');$('video').classList.remove('hidden');$('guide').classList.remove('hidden');$('generate').classList.add('hidden');$('result').classList.add('hidden');$('empty').classList.remove('hidden');$('download').classList.add('hidden');$('print').classList.add('hidden');$('delivery').classList.add('hidden');photo='';fallbackPhoto='';setStatus('Camera ready.')}
+    function capture(){const v=$('video'),c=$('canvas');if(!v.videoWidth){setStatus('Camera is not ready yet.',true);return}c.width=768;c.height=1024;const ctx=c.getContext('2d');const scale=Math.max(c.width/v.videoWidth,c.height/v.videoHeight);ctx.save();ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,(c.width-v.videoWidth*scale)/2,(c.height-v.videoHeight*scale)/2,v.videoWidth*scale,v.videoHeight*scale);ctx.restore();photo=c.toDataURL('image/jpeg',.78);c.classList.remove('hidden');v.classList.add('hidden');$('guide').classList.add('hidden');$('generate').classList.remove('hidden');setStatus('Photo captured. Generate when ready.')}
+    function retake(){$('canvas').classList.add('hidden');$('video').classList.remove('hidden');$('guide').classList.remove('hidden');$('generate').classList.add('hidden');$('result').classList.add('hidden');$('empty').classList.remove('hidden');$('download').classList.add('hidden');$('print').classList.add('hidden');$('delivery').classList.add('hidden');photo='';setStatus('Camera ready.')}
     async function generate(){
       if(!photo)return;
       $('generate').disabled=true;$('spinner').classList.remove('hidden');setStatus('Creating your portrait with FLUX Kontext Pro…');
       try{
         const custom=$('custom').value.trim();
         const prompt=`Transform this person into ${custom||selected[3]}. Preserve the same recognizable identity, facial structure, skin tone, age, hairstyle and expression. One person only. Exhibition-quality vertical portrait, detailed and polished.`;
-        const response=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:photo,fallbackImage:fallbackPhoto,prompt})});
+        const response=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:photo,prompt})});
         const text=await response.text();let data={};
         try{data=text?JSON.parse(text):{}}catch{throw new Error(`Local server returned an unreadable response (HTTP ${response.status}).`)}
         if(!response.ok)throw new Error(data.error||`Generation failed (HTTP ${response.status}).`);
